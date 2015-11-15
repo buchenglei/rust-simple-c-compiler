@@ -1,0 +1,4 @@
+[package]
+name = "rust-simple-c-compiler"
+version = "0.1.0"
+authors = ["buchenglei <mybc724@163.com>"]
