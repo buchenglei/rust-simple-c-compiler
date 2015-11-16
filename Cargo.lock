@@ -1,0 +1,4 @@
+[root]
+name = "rust-simple-c-compiler"
+version = "0.1.0"
+
