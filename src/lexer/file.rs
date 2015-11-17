@@ -29,20 +29,37 @@ impl Source {
 	
 	pub fn len(&self) -> usize { self.len }
 	
+	// 判断当前符号是否为空白符（或者多个重复字符只需要保留一个的情况）
+	fn is_invisible_char(c: u8) -> bool {
+		match c {
+			// 空格
+			32 => true,
+			// \r\n
+			10 | 13 => true,
+				// tab
+			9 | 11 => true,
+			// other
+			_ => false
+		}
+	}
+	
 	pub fn next_char(&mut self) -> Option<char> {
 		let mut c: u8;
 		while self.pointer < self.len {
 			c = self.buffer[self.pointer];
 			if c.is_ascii() {
-				match c {
-					32 => self.pointer += 1,
-					10 | 13 => self.pointer += 1,
-					_ => {
-						self.pointer += 1;
-						return Some(c as char);
-					},
+				if Source::is_invisible_char(c) {
+					// 这里处理空白符号的情况
+					self.pointer += 1;
+					// 当下一个字符不是空白符时，则返一个空格
+					if !Source::is_invisible_char(self.buffer[self.pointer]) {
+						return Some(' ')
+					}
+				} else {
+					// 这里处理非空白符号的情况
+					self.pointer += 1;
+					return Some(c as char);
 				}
-			
 			} else {
 				panic!("Error: now, the program can't support this charset, please use ASCII");
 			}
@@ -59,14 +76,13 @@ impl Source {
 			self.pointer -= 1;
 			c = self.buffer[self.pointer];
 			if c.is_ascii() {
-				match c {
-					32 => {1;},
-					10 | 13 => {1;},
-					_ => {
-						return;
-					},
+				if Source::is_invisible_char(c) &&
+					Source::is_invisible_char(self.buffer[self.pointer - 1]) {
+					// do nothing
+					// don't add any code at here!!!
+				} else {
+					return;
 				}
-			
 			}
 		}
 		self.pointer = 0;
