@@ -7,6 +7,8 @@ pub struct Source {
 	buffer: Vec<u8>,
 	pointer: usize,
 	len: usize,
+	row: u32,
+	col: u32,
 	//filename: &str,
 }
 
@@ -22,7 +24,8 @@ impl Source {
 		Source {
 			pointer: 0,
 			len: buf.len(),
-			//filename: _
+			row: 1,
+			col: 1,
 			buffer: buf,
  		}
 	}
@@ -43,11 +46,29 @@ impl Source {
 		}
 	}
 	
+	// 屏蔽不同平台下换行符的差异
+	#[cfg(target_os = "windows")]
+	fn newline() -> u8 { 10 }
+	
+	#[cfg(target_os = "linux")]
+	fn newline() -> u8 { 10 }
+	
+	#[cfg(target_os = "mac")]
+	fn newline() -> u8 { 13 }
+	
 	pub fn next_char(&mut self) -> Option<char> {
 		let mut c: u8;
 		while self.pointer < self.len {
 			c = self.buffer[self.pointer];
 			if c.is_ascii() {
+				// 标记字符的位置
+				if c == Source::newline() {
+					self.row += 1;
+					self.col = 1;
+				} else {
+					self.col += 1;
+				}
+				
 				if Source::is_invisible_char(c) {
 					// 这里处理空白符号的情况
 					self.pointer += 1;
@@ -74,6 +95,8 @@ impl Source {
 		}		
 		while self.pointer >= 0usize {
 			self.pointer -= 1;
+			// 理论上说，指针回退的过程只可能发生在行内，不可能会退到上一行去
+			self.col -= 1;
 			c = self.buffer[self.pointer];
 			if c.is_ascii() {
 				if Source::is_invisible_char(c) &&
@@ -86,5 +109,10 @@ impl Source {
 			}
 		}
 		self.pointer = 0;
+	}
+	
+	// 返回当前指针处理到的位置
+	pub fn position(&self) -> (u32, u32) {
+		(self.row, self.col)
 	}
 }

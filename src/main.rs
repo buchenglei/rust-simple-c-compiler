@@ -5,9 +5,11 @@ use lexer::file::Source;
 
 fn main() {
     let mut f = Source::new("foo.txt");
-    println!("All char of f:");
     while let Some(c) = f.next_char() {
-        print!("{}", c);
+        if c != ' ' {
+            let (x, y) = f.position();
+            println!("pos:{}-{}, {}", x, y,c);
+        }
     }
     println!(" ");
     f.back_pointer();
