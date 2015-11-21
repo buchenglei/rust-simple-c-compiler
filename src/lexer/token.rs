@@ -60,12 +60,12 @@ pub struct Token {
 }
 
 impl Token {
-	fn new(w: Word, r: u32, c: u32) -> Token {
+	pub fn new(w: Word, r: u32, c: u32) -> Token {
 		Token { w: w, row: r, col: c }
 	}
 	
 	// 获得当前token中的单词的类型
-	fn get_type(&self) -> WordType {
+	pub fn get_type(&self) -> WordType {
 		match self.w {
 			Word::IF |
 			Word::ELSE |
@@ -88,7 +88,7 @@ impl Token {
 	}
 	
 	// 返回该token中单词的字符串形式
-	fn get_str(&self) -> &str {
+	pub fn get_str(&self) -> &str {
 		match self.w {
 			Word::IF => "if",
 			Word::ELSE => "else",
@@ -111,7 +111,7 @@ impl Token {
 	}
 	
 	// 返回当前token中单词在源文件中的位置
-	fn get_position(&self) -> (u32, u32) {
+	pub fn get_position(&self) -> (u32, u32) {
 		(self.row, self.col)
 	}
 }
