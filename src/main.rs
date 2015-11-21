@@ -5,15 +5,14 @@ use lexer::file::Source;
 
 fn main() {
     let mut f = Source::new("foo.txt");
+    println!("the first poistion at {:?}", f.position());
     while let Some(c) = f.next_char() {
         if c != ' ' {
             let (x, y) = f.position();
             println!("pos:{}-{}, {}", x, y,c);
         }
     }
-    println!(" ");
-    f.back_pointer();
-    f.back_pointer();
+    println!("the end poistion at {:?}", f.position());
     f.back_pointer();
     println!("{:?}", f.next_char());
     

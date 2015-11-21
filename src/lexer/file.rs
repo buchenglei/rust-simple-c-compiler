@@ -25,7 +25,7 @@ impl Source {
 			pointer: 0,
 			len: buf.len(),
 			row: 1,
-			col: 1,
+			col: 0, // 初始位置在第1行，第0列
 			buffer: buf,
  		}
 	}
@@ -57,58 +57,33 @@ impl Source {
 	fn newline() -> u8 { 13 }
 	
 	pub fn next_char(&mut self) -> Option<char> {
-		let mut c: u8;
-		while self.pointer < self.len {
+		let c:u8;
+		if self.pointer < self.len {
 			c = self.buffer[self.pointer];
-			if c.is_ascii() {
-				// 标记字符的位置
-				if c == Source::newline() {
-					self.row += 1;
-					self.col = 1;
-				} else {
-					self.col += 1;
-				}
-				
-				if Source::is_invisible_char(c) {
-					// 这里处理空白符号的情况
-					self.pointer += 1;
-					// 当下一个字符不是空白符时，则返一个空格
-					if !Source::is_invisible_char(self.buffer[self.pointer]) {
-						return Some(' ')
-					}
-				} else {
-					// 这里处理非空白符号的情况
-					self.pointer += 1;
-					return Some(c as char);
-				}
-			} else {
-				panic!("Error: now, the program can't support this charset, please use ASCII");
-			}
+		} else {
+			return None;
 		}
-		None
+		if c.is_ascii() {
+			// 标记字符的位置
+			if c == Source::newline() {
+				self.row += 1;
+				self.col = 0;
+			} else {
+				self.col += 1;
+			}
+			// 指针后移一位
+			self.pointer += 1;
+			// 将所有空白符替换为空格
+			if Source::is_invisible_char(c) { return Some(' '); }
+			// 反回当前字符
+			Some(c as char)
+		} else {
+			None
+		}
 	}
 	
 	pub fn back_pointer(&mut self) {
-		let mut c: u8;
-		if self.pointer >= self.len {
-			self.pointer = self.len -1;
-		}		
-		while self.pointer >= 0usize {
-			self.pointer -= 1;
-			// 理论上说，指针回退的过程只可能发生在行内，不可能会退到上一行去
-			self.col -= 1;
-			c = self.buffer[self.pointer];
-			if c.is_ascii() {
-				if Source::is_invisible_char(c) &&
-					Source::is_invisible_char(self.buffer[self.pointer - 1]) {
-					// do nothing
-					// don't add any code at here!!!
-				} else {
-					return;
-				}
-			}
-		}
-		self.pointer = 0;
+		self.pointer -= 1;
 	}
 	
 	// 返回当前指针处理到的位置
