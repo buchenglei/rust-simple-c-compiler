@@ -16,6 +16,14 @@ fn test_token() {
 	assert_eq!("token", token2.get_str());
 	assert_eq!((5u32, 7u32), token2.get_position());
 	
+	let token3 = Token::new(Word::LParenthesis, 8, 10);
+	match token3.get_type() {
+		WordType::Separator => assert!(true),
+		_ => assert!(false),
+	}
+	assert_eq!("(", token3.get_str());
+	assert_eq!((8u32, 10u32), token3.get_position());
+	
 }
 
 // 定义单词的种类
@@ -37,6 +45,12 @@ pub enum Word {
 	GE, // >=
 	ADD, // +
 	SUB, // -
+	// 定义分隔符
+	LBrace, // {
+	RBrace, // }
+	LParenthesis, // (
+	RParenthesis, // )
+	Semicolon, // ;
 	// 定义标识符
 	Id(&'static str),
 	// 定义值
@@ -47,6 +61,7 @@ pub enum Word {
 pub enum WordType {
 	Keyword,
 	Operator,
+	Separator, // 分隔符
 	Id,
 	Value, // 值类型
 	Unknown
@@ -82,6 +97,11 @@ impl Token {
 			Word::GE |
 			Word::ADD |
 			Word::SUB => WordType::Operator,
+			Word::LBrace |
+			Word::RBrace |
+			Word::LParenthesis |
+			Word::RParenthesis |
+			Word::Semicolon => WordType::Separator,
 			Word::Id(_) => WordType::Id,
 			Word::Value(_) => WordType::Value,
 		}
@@ -105,6 +125,11 @@ impl Token {
 			Word::GE => ">=",
 			Word::ADD => "+",
 			Word::SUB => "-",
+			Word::LBrace => "{",
+			Word::RBrace => "}",
+			Word::LParenthesis => "(",
+			Word::RParenthesis => ")",
+			Word::Semicolon => ";",
 			Word::Id(ref s) => s,
 			Word::Value(ref s) => s,
 		}
