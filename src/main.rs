@@ -2,7 +2,7 @@
 mod lexer;
 
 use lexer::file::Source;
-use lexer::nfa;
+use lexer::dfa;
 
 fn main() {
     /*println!("the first poistion at {:?}", f.position());
@@ -15,30 +15,34 @@ fn main() {
     println!("the end poistion at {:?}", f.position());
     f.back_pointer();
     println!("{:?}", f.next_char());*/
-    run_lexer();
+    run_lexer_dfa();
 }
 
-fn run_lexer() {
+fn run_lexer_dfa() {
     let mut f = Source::new("foo.txt");
-    let mut nfa: Option<nfa::NFA> = None;
-    let mut change_nfa: bool = true;
-    let mut status: nfa::Status = nfa::Status::MoveTo(0);
+    let mut dfa: Option<dfa::DFA> = None;
+    let mut change_dfa: bool = true;
+    let mut state: dfa::State = dfa::State::MoveTo(0);
+    let mut start_col: u32 = 1;
+    let mut end_col: u32 = 1;
+    let mut word: String;
     while let Some(c) = f.next_char() {
-        if change_nfa {
-            nfa = nfa::choose_nfa(c);
+        if change_dfa {
+            dfa = dfa::choose_dfa(c);
+            start_col = f.position().1;
         }
-        match status {
-            nfa::Status::Accepted => {
-                // 生成token
-                // ...
-                change_nfa = true;
-                println!("accept");
+        match state {
+            dfa::State::Accepted(ref t) => {
+                f.back_pointer();
+                end_col = f.position().1;
+                word = f.get_word(start_col as usize, end_col as usize);
+                println!("Accept word is |{}|", word);
+                change_dfa = true; 
             },
-            nfa::Status::Unaccepted => println!("Error!!!"),
-            nfa::Status::MoveTo(s) => {
-                change_nfa = false;
-                status = nfa.unwrap()(s, c);
-                println!("{:?}", status);
+            dfa::State::Unaccepted => println!("Error!!!"),
+            dfa::State::MoveTo(s) => {
+                change_dfa = false;
+                state = dfa.unwrap()(s, c);
             }
         }
     }

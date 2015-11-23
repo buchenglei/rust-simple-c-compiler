@@ -84,10 +84,21 @@ impl Source {
 	
 	pub fn back_pointer(&mut self) {
 		self.pointer -= 1;
+		self.col -= 1;
 	}
 	
 	// 返回当前指针处理到的位置
 	pub fn position(&self) -> (u32, u32) {
 		(self.row, self.col)
+	}
+	
+	// 获得指定范围的字符并组成一个String返回
+	pub fn get_word(&self, start: usize, end: usize) -> String {
+		let tmp_vec = &self.buffer[start - 1..end - 1];
+		let mut word = String::with_capacity(end - start + 1);
+		for c in tmp_vec {
+			word.push(*c as char);
+		}
+		word
 	}
 }

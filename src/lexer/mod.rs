@@ -4,3 +4,5 @@ pub mod file;
 pub mod token;
 // 模拟NAF
 pub mod nfa;
+// DFA实现
+pub mod dfa;
