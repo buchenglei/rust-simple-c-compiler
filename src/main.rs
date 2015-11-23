@@ -3,6 +3,7 @@ mod lexer;
 
 use lexer::file::Source;
 use lexer::dfa;
+use lexer::token;
 
 fn main() {
     /*println!("the first poistion at {:?}", f.position());
@@ -36,7 +37,7 @@ fn run_lexer_dfa() {
                 f.back_pointer();
                 end_col = f.position().1;
                 word = f.get_word(start_col as usize, end_col as usize);
-                println!("Accept word is |{}|", word);
+                println!("Accept word is |{}|, is keyword? {}", &word, token::Token::is_keyword(&word));
                 change_dfa = true; 
             },
             dfa::State::Unaccepted => println!("Error!!!"),

@@ -57,6 +57,16 @@ pub enum Word {
 	Value(&'static str),
 }
 
+const N: usize = 6;
+const keyword: [&'static str; N] = [
+	"if",
+	"else",
+	"int",
+	"void",
+	"char",
+	"string"
+];
+
 // 定义单词的类型
 pub enum WordType {
 	Keyword,
@@ -138,5 +148,16 @@ impl Token {
 	// 返回当前token中单词在源文件中的位置
 	pub fn get_position(&self) -> (u32, u32) {
 		(self.row, self.col)
+	}
+	
+	// 判断字符串是否是关键字
+	pub fn is_keyword(word: &str) -> bool {
+		for i in 0..N {
+			if keyword[i] == word {
+				return true;
+			}
+		}
+		
+		false
 	}
 }
