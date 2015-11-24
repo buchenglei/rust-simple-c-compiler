@@ -20,6 +20,10 @@ impl Source {
 		//let mut buf = String::new();
 		let mut buf:Vec<u8> = Vec::new();
 		source_file.read_to_end(&mut buf).ok().expect("Error: can't read file content");
+		// 因为在后面读取字符的时候，每个换行符都会被换成空格返回
+		// 在后面的逻辑中，字符流的结尾至少需要加2个空格才能正常工作
+		buf.push(32);
+		buf.push(32);
 		// 构造Source，并返回
 		Source {
 			pointer: 0,
