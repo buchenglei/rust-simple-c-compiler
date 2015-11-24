@@ -12,6 +12,10 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
 	if c.is_alphabetic() {
 		return Some(dfa_id);
 	}
+	if c == ' ' {
+		return Some(dfa_whitespace)
+	}
+	
 	// 如果c不是以上任何一个类型的字符，则报错
 	panic!("Error: Unrecognized char!");
 }
@@ -33,6 +37,27 @@ pub fn dfa_id(s: u8, c: char) -> State {
 				State::MoveTo(1)
 			} else {
 				State::Accepted(WordType::Id)
+			}
+		}
+		_ =>  State::Unaccepted
+	}
+}
+
+// 匹配空白符的dfa
+pub fn dfa_whitespace(s: u8, c: char) -> State {
+	match s {
+		0 => {
+			if c == ' ' {
+				State::MoveTo(1)
+			} else {
+				State::Unaccepted
+			}
+		}
+		1 => {
+			if c == ' ' {
+				State::MoveTo(1)
+			} else {
+				State::Accepted(WordType::Unknown)
 			}
 		}
 		_ =>  State::Unaccepted

@@ -60,7 +60,7 @@ impl Source {
 	#[cfg(target_os = "mac")]
 	fn newline() -> u8 { 13 }
 	
-	pub fn next_char(&mut self) -> Option<char> {
+	pub fn get_char(&mut self) -> Option<char> {
 		let c:u8;
 		if self.pointer < self.len {
 			c = self.buffer[self.pointer];
@@ -76,7 +76,7 @@ impl Source {
 				self.col += 1;
 			}
 			// 指针后移一位
-			self.pointer += 1;
+			//self.pointer += 1;
 			// 将所有空白符替换为空格
 			if Source::is_invisible_char(c) { return Some(' '); }
 			// 反回当前字符
@@ -88,21 +88,31 @@ impl Source {
 	
 	pub fn back_pointer(&mut self) {
 		self.pointer -= 1;
-		self.col -= 1;
+        if self.col != 0 {
+            self.col -= 1;
+        }
 	}
 	
 	// 返回当前指针处理到的位置
 	pub fn position(&self) -> (u32, u32) {
 		(self.row, self.col)
 	}
+
+    pub fn next_pointer(&mut self) {
+        self.pointer += 1
+    }
 	
 	// 获得指定范围的字符并组成一个String返回
 	pub fn get_word(&self, start: usize, end: usize) -> String {
-		let tmp_vec = &self.buffer[start - 1..end - 1];
+		let tmp_vec = &self.buffer[start..end];
 		let mut word = String::with_capacity(end - start + 1);
 		for c in tmp_vec {
 			word.push(*c as char);
 		}
 		word
+	}
+	
+	pub fn get_pointer(&self) -> usize {
+		self.pointer
 	}
 }
