@@ -6,3 +6,5 @@ pub mod token;
 pub mod nfa;
 // DFA实现
 pub mod dfa;
+// 模块入口
+pub mod parse;
