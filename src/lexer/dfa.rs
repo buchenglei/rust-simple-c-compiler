@@ -18,6 +18,10 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
     if c.is_numeric() {
         return Some(dfa_num)
     }
+
+    // 由于要检测< > = ...这些字符，比较多，所以就放最后
+    // 也就是说运算符是我需要匹配的最后一类词法单元
+    return Some(dfa_operator);
 	
 	// 如果c不是以上任何一个类型的字符，则报错
 	panic!("Error: Unrecognized char!");
@@ -101,5 +105,35 @@ pub fn dfa_num(s: u8, c: char) -> State {
             }
         },
 		_ =>  State::Unaccepted
+    }
+}
+
+// 匹配运算符的DFA
+pub fn dfa_operator(s: u8, c: char) -> State {
+    match s {
+        0 => {
+            match c {
+                '<' |
+                '>' |
+                '=' |
+                '!' |
+                '+' |
+                '-' |
+                '*' |
+                '/' => State::MoveTo(1),
+                _ => State::Unaccepted,
+            }
+        },
+        1 => {
+            if c == '=' {
+               State::MoveTo(2) 
+            } else {
+                State::Accepted(WordType::Operator)
+            }
+        },
+        2 =>{
+            State::Accepted(WordType::Operator)
+        }
+        _ => State::Unaccepted
     }
 }
