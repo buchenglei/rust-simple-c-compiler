@@ -18,6 +18,9 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
     if c.is_numeric() {
         return Some(dfa_num)
     }
+    if c == '\'' {
+        return Some(dfa_char)
+    }
 
     // 由于要检测< > = ...这些字符，比较多，所以就放最后
     // 也就是说运算符是我需要匹配的最后一类词法单元
@@ -133,6 +136,38 @@ pub fn dfa_operator(s: u8, c: char) -> State {
         },
         2 =>{
             State::Accepted(WordType::Operator)
+        }
+        _ => State::Unaccepted
+    }
+}
+
+// 匹配值类型中的字符值
+pub fn dfa_char(s: u8, c: char) -> State {
+    match s {
+        0 => {
+            if c == '\'' {
+                State::MoveTo(1)
+            } else {
+                State::Unaccepted
+            }
+        },
+        1 => {
+            // ASCII字符从32（空格）到126（~）
+            if (c as u8) >= 32 && (c as u8) <= 126 {
+                State::MoveTo(2)
+            } else {
+                State::Unaccepted
+            }
+        },
+        2 => {
+            if c == '\'' {
+                State::MoveTo(3)
+            } else {
+                State::Unaccepted
+            }
+        },
+        3 => {
+            State::Accepted(WordType::Value)
         }
         _ => State::Unaccepted
     }
