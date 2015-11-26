@@ -35,13 +35,24 @@ pub fn run(filepath: &str) {
                 f.back_pointer();
 				// 这里的end就是紧跟在单词后面的第一个字符
                 end = f.get_pointer();
-                //match *t {
-                //    WordType::Unknown => continue,
-               //     _ => {println!("test");},
-                //}
 				// 这里获取单词时的范围，包含start，但不包含end，遵循rust的语法风格
                 word = f.get_word(start, end);
-                println!("Accept word is |{}|, is keyword? {}", &word, Token::is_keyword(&word));
+                // 对DFA返回的不同类型的结果做分别处理
+                match *t {
+                    WordType::Id => {
+                        println!("Accept word is |{}|, it is Id, but it is Keyword? {}", &word,Token::is_keyword(&word));
+                    },
+                    WordType::Operator => {
+                        println!("Accept word is |{}|, it is Operator", &word);
+                    },
+                    WordType::Separator => {
+                        println!("Accept word is |{}|, it is Separator", &word);
+                    },
+                    WordType::Value => {
+                        println!("Accept word is |{}|, it is Value", &word);
+                    },
+                    _ => (),
+                }
 				// 已完成一个单词的识别，需要重新选择dfa识别函数
                 change_dfa = true; 
             },        
