@@ -21,6 +21,12 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
     if c == '\'' {
         return Some(dfa_char)
     }
+    if c == '"' {
+        return Some(dfa_string)
+    }
+    if c == '{' || c =='}' || c == '(' || c == ')' || c == ';' || c == ','{
+        return Some(dfa_separator)
+    }
 
     // 由于要检测< > = ...这些字符，比较多，所以就放最后
     // 也就是说运算符是我需要匹配的最后一类词法单元
@@ -169,6 +175,51 @@ pub fn dfa_char(s: u8, c: char) -> State {
         3 => {
             State::Accepted(WordType::Value)
         }
+        _ => State::Unaccepted
+    }
+}
+
+// 匹配分隔符的DFA
+pub fn dfa_separator(s: u8, c: char) -> State {
+    match s {
+        0 => {
+            match c {
+                '{' |
+                '}' |
+                '(' |
+                ')' |
+                ',' |
+                ';' => State::MoveTo(1),
+                _ => State::Unaccepted
+            }
+        },
+        1 => {
+            State::Accepted(WordType::Separator)
+        },
+        _ => State::Unaccepted
+    }
+}
+
+// 匹配值类型中的字符串
+fn dfa_string(s: u8, c: char) -> State {
+    match s {
+        0 => {
+            if c == '"' {
+                State::MoveTo(1)
+            } else {
+                State::Unaccepted
+            }
+        },
+        1 => {
+            if c != '"' {
+                State::MoveTo(1)
+            } else {
+                State::MoveTo(2)
+            }
+        },
+        2 => {
+            State::Accepted(WordType::Value)
+        },
         _ => State::Unaccepted
     }
 }
