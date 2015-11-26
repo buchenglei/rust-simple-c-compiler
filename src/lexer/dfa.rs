@@ -1,4 +1,5 @@
 use lexer::token::{Word, WordType, Token};
+use lexer::file::Source;
 pub type DFA = fn(u8, char) -> State;
 
 pub enum State {
@@ -12,7 +13,7 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
 	if c.is_alphabetic() {
 		return Some(dfa_id);
 	}
-	if c == ' ' {
+	if Source::is_invisible_char(c as u8) {
 		return Some(dfa_whitespace)
 	}
     if c.is_numeric() {
@@ -63,14 +64,14 @@ pub fn dfa_id(s: u8, c: char) -> State {
 pub fn dfa_whitespace(s: u8, c: char) -> State {
 	match s {
 		0 => {
-			if c == ' ' {
+			if Source::is_invisible_char(c as u8) {
 				State::MoveTo(1)
 			} else {
 				State::Unaccepted
 			}
 		}
 		1 => {
-			if c == ' ' {
+			if Source::is_invisible_char(c as u8) {
 				State::MoveTo(1)
 			} else {
 				State::Accepted(WordType::Unknown)

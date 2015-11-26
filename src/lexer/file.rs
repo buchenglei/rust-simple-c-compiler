@@ -37,7 +37,7 @@ impl Source {
 	pub fn len(&self) -> usize { self.len }
 	
 	// 判断当前符号是否为空白符（或者多个重复字符只需要保留一个的情况）
-	fn is_invisible_char(c: u8) -> bool {
+	pub fn is_invisible_char(c: u8) -> bool {
 		match c {
 			// 空格
 			32 => true,
@@ -78,7 +78,7 @@ impl Source {
 			// 指针后移一位
 			//self.pointer += 1;
 			// 将所有空白符替换为空格
-			if Source::is_invisible_char(c) { return Some(' '); }
+			//if Source::is_invisible_char(c) { return Some(' '); }
 			// 反回当前字符
 			Some(c as char)
 		} else {
