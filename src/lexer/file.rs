@@ -52,13 +52,13 @@ impl Source {
 	
 	// 屏蔽不同平台下换行符的差异
 	#[cfg(target_os = "windows")]
-	fn newline() -> u8 { 10 }
+	pub fn newline() -> u8 { 10 }
 	
 	#[cfg(target_os = "linux")]
-	fn newline() -> u8 { 10 }
+	pub fn newline() -> u8 { 10 }
 	
 	#[cfg(target_os = "mac")]
-	fn newline() -> u8 { 13 }
+	pub fn newline() -> u8 { 13 }
 	
 	pub fn get_char(&mut self) -> Option<char> {
 		let c:u8;

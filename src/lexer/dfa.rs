@@ -25,6 +25,9 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
     if c == '"' {
         return Some(dfa_string)
     }
+    if c == '#' {
+        return Some(dfa_comments)
+    }
     if c == '{' || c =='}' || c == '(' || c == ')' || c == ';' || c == ','{
         return Some(dfa_separator)
     }
@@ -221,6 +224,67 @@ fn dfa_string(s: u8, c: char) -> State {
         2 => {
             State::Accepted(WordType::Value)
         },
+        _ => State::Unaccepted
+    }
+}
+
+// 匹配注释的DFA
+pub fn dfa_comments(s: u8, c: char) -> State {
+    match s {
+        0 => {
+            if c == '#' {
+                State::MoveTo(1)
+            } else {
+                State::Unaccepted
+            }
+        },
+        1 => {
+            if c == '*' {
+                State::MoveTo(2)
+            } else if c == '#' {
+                State::MoveTo(3)
+            } else {
+                State::Unaccepted
+            }
+        },
+        2 => {
+            if c == '*' {
+                State::MoveTo(4)
+            } else {
+                State::MoveTo(5)
+            }
+        },
+        3 => {
+            if (c as u8) == Source::newline() {
+                State::MoveTo(7)
+            } else {
+                State::MoveTo(6)
+            }
+        },
+        4 => {
+            if c == '#' {
+                State::MoveTo(7)
+            } else {
+                State::Unaccepted
+            }
+        },
+        5 => {
+            if c == '*' {
+                State::MoveTo(4)
+            } else {
+                State::MoveTo(5)
+            }
+        },
+        6 => {
+            if (c as u8) == Source::newline() {
+                State::MoveTo(7)
+            } else {
+                State::MoveTo(6)
+            }
+        },
+        7 => {
+            State::Accepted(WordType::Unknown)
+        }
         _ => State::Unaccepted
     }
 }
