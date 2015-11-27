@@ -3,7 +3,7 @@ use lexer::dfa;
 use lexer::token::{WordType, Token};
 
 // 执行词法分析器parse
-pub fn run(filepath: &str) {
+pub fn run(filepath: &str) -> Vec<Token>{
     let mut f = file::Source::new(filepath);
 	// 识别相应词法单元的函数，由choose_dfa生成相应的识别函数
     let mut dfa: Option<dfa::DFA> = None;
@@ -22,6 +22,8 @@ pub fn run(filepath: &str) {
     let mut end: usize = 0;
 	// 匹配到的单词
     let mut word: String;
+    // 用于存储Token的Vector
+    let mut tokens: Vec<Token> = Vec::new();
 
     while let Some(c) = f.get_char() {
 		// 这里只有当状态为Accepted是才更新dfa选择函数
@@ -48,20 +50,39 @@ pub fn run(filepath: &str) {
                 // 获取该单词在源文件中实际的结束位置
                 end_row = f.position().0; 
                 end_col = f.position().1;
-                println!("this word start at ({},{}), end at ({},{})", start_row,start_col,end_row,end_col);
                 // 对DFA返回的不同类型的结果做分别处理
                 match *t {
                     WordType::Id => {
-                        println!("Accept word is |{}|, it is Id, but it is Keyword? {}", &word,Token::is_keyword(&word));
+                        tokens.push(Token::new(
+                            Token::str_to_word(word, WordType::Id),
+                            WordType::Id,
+                            start_row,
+                            end_col
+                        ));
                     },
                     WordType::Operator => {
-                        println!("Accept word is |{}|, it is Operator", &word);
+                        tokens.push(Token::new(
+                            Token::str_to_word(word, WordType::Operator),
+                            WordType::Operator,
+                            start_row,
+                            start_col
+                        ));
                     },
                     WordType::Separator => {
-                        println!("Accept word is |{}|, it is Separator", &word);
+                        tokens.push(Token::new(
+                            Token::str_to_word(word, WordType::Separator),
+                            WordType::Separator,
+                            start_row,
+                            start_col
+                        ));
                     },
                     WordType::Value => {
-                        println!("Accept word is |{}|, it is Value", &word);
+                        tokens.push(Token::new(
+                            Token::str_to_word(word, WordType::Value),
+                            WordType::Value,
+                            start_row,
+                            start_col
+                        ));
                     },
                     _ => (),
                 }
@@ -86,4 +107,5 @@ pub fn run(filepath: &str) {
             }
         }                                                             
     }
+    tokens
 }

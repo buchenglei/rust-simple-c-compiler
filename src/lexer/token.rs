@@ -27,6 +27,7 @@ fn test_token() {
 }
 
 // 定义单词的种类
+#[derive(Debug)]
 pub enum Word {
 	// 定义关键字
 	IF,
@@ -44,7 +45,13 @@ pub enum Word {
 	GT, // >
 	GE, // >=
 	ADD, // +
+    ADDE,// +=
 	SUB, // -
+    SUBE, // -=
+    MUL, // *
+    MULE, // *=
+    DIV, // /
+    DIVE, // /=
 	// 定义分隔符
 	LBrace, // {
 	RBrace, // }
@@ -52,9 +59,10 @@ pub enum Word {
 	RParenthesis, // )
 	Semicolon, // ;
 	// 定义标识符
-	Id(&'static str),
+	Id(String),
 	// 定义值
-	Value(&'static str),
+	Value(String),
+    Nothing
 }
 
 const N: usize = 6;
@@ -68,6 +76,7 @@ const keyword: [&'static str; N] = [
 ];
 
 // 定义单词的类型
+#[derive(Debug)]
 pub enum WordType {
 	Keyword,
 	Operator,
@@ -78,17 +87,20 @@ pub enum WordType {
 }
 
 // 定义一个持有单词的Token
+#[derive(Debug)]
 pub struct Token {
 	w: Word,		// 该Token持有的单词
+    t: WordType,    // 该Token的类型
 	row: u32,		// 单词开头所在的行
 	col: u32,		// 单词开头所在的列
 }
 
 impl Token {
-	pub fn new(w: Word, r: u32, c: u32) -> Token {
-		Token { w: w, row: r, col: c }
+	pub fn new(word: Word, wt: WordType,r: u32, c: u32) -> Token {
+		Token { w: word, t: wt, row: r, col: c }
 	}
 	
+    /*
 	// 获得当前token中的单词的类型
 	pub fn get_type(&self) -> WordType {
 		match self.w {
@@ -106,7 +118,13 @@ impl Token {
 			Word::GT |
 			Word::GE |
 			Word::ADD |
-			Word::SUB => WordType::Operator,
+            Word::ADDE |
+            Word::SUB |
+            Word::SUBE |
+            Word::MUL |
+            Word::MULE |
+            Word::DIV |
+			Word::DIVE => WordType::Operator,
 			Word::LBrace |
 			Word::RBrace |
 			Word::LParenthesis |
@@ -115,8 +133,9 @@ impl Token {
 			Word::Id(_) => WordType::Id,
 			Word::Value(_) => WordType::Value,
 		}
-	}
+	}*/
 	
+    /*
 	// 返回该token中单词的字符串形式
 	pub fn get_str(&self) -> &str {
 		match self.w {
@@ -143,7 +162,7 @@ impl Token {
 			Word::Id(ref s) => s,
 			Word::Value(ref s) => s,
 		}
-	}
+	}*/
 	
 	// 返回当前token中单词在源文件中的位置
 	pub fn get_position(&self) -> (u32, u32) {
@@ -160,4 +179,55 @@ impl Token {
 		
 		false
 	}
+
+    // 根据字符串返回当前单词的Word形式
+    pub fn str_to_word(s: String, t: WordType) -> Word {
+        match t {
+            WordType::Value => {
+                Word::Value(s)
+            },
+            WordType::Id => {
+                match &s[..] {
+                    "if" => Word::IF,
+                    "void" => Word::VOID,
+                    "else" => Word::ELSE,
+                    "int" => Word::INT,
+                    "char" => Word::CHAR,
+                    "string" => Word::STRING,
+                    _ => Word::Id(s)
+                }
+            },
+            WordType::Operator => {
+                match &s[..] {
+                    "<" => Word::LT,
+                    "<=" => Word::LE,
+                    "=" => Word::EQ,
+                    "==" => Word::EE,
+                    "!=" => Word::NE,
+                    ">" => Word::GT,
+                    ">=" => Word::GE,
+                    "+" => Word::ADD,
+                    "+=" => Word::ADDE,
+                    "-" => Word::SUB,
+                    "-=" => Word::SUBE,
+                    "*" => Word::MUL,
+                    "*=" => Word::MULE,
+                    "/" => Word::DIV,
+                    "/=" => Word::DIVE,
+                    _ => Word::Nothing,
+                }
+            },
+            WordType::Separator => {
+                match &s[..] {
+                    "{" => Word::LBrace,
+                    "}" => Word::RBrace,
+                    "(" => Word::LParenthesis,
+                    ")" => Word::RParenthesis,
+                    ";" => Word::Semicolon,
+                    _ => Word::Nothing
+                }
+            },
+            _ => Word::Nothing
+        }
+    }
 }

@@ -2,5 +2,6 @@
 mod lexer;
 
 fn main() {
-    lexer::parse::run("e:/workspace/rustlang/foo.txt");
+    let tokens = lexer::parse::run("e:/workspace/rustlang/foo.txt");
+    println!("{:?}", tokens);
 }
