@@ -1,10 +1,10 @@
-use lexer::file;
+use lexer::file::{Source};
 use lexer::dfa;
 use lexer::token::{WordType, Token};
 
 // 执行词法分析器parse
 pub fn run(filepath: &str) -> Vec<Token>{
-    let mut f = file::Source::new(filepath);
+    let mut f = Source::new(filepath);
 	// 识别相应词法单元的函数，由choose_dfa生成相应的识别函数
     let mut dfa: Option<dfa::DFA> = None;
 	// 当一个词素识别完成后，这是重新生成dfa识别函数的的标志
@@ -12,10 +12,8 @@ pub fn run(filepath: &str) -> Vec<Token>{
 	// 当前状态
     let mut state: dfa::State = dfa::State::MoveTo(0);
     // 标记单词在文本中实际的位置
-    let mut start_row: u32 = 0;
-    let mut start_col: u32 = 0;
-    let mut end_row: u32 = 0;
-    let mut end_col: u32 = 0;
+    let mut start_row: u32 = 1;
+    let mut start_col: u32 = 1;
 	// 词素开始的位置
     let mut start: usize = 0;
 	// 词素结束的位置
@@ -47,9 +45,6 @@ pub fn run(filepath: &str) -> Vec<Token>{
                 end = f.get_pointer();
 				// 这里获取单词时的范围，包含start，但不包含end，遵循rust的语法风格
                 word = f.get_word(start, end);
-                // 获取该单词在源文件中实际的结束位置
-                end_row = f.position().0; 
-                end_col = f.position().1;
                 // 对DFA返回的不同类型的结果做分别处理
                 match *t {
                     WordType::Id => {
@@ -57,7 +52,7 @@ pub fn run(filepath: &str) -> Vec<Token>{
                             Token::str_to_word(word, WordType::Id),
                             WordType::Id,
                             start_row,
-                            end_col
+                            start_col
                         ));
                     },
                     WordType::Operator => {
@@ -91,9 +86,7 @@ pub fn run(filepath: &str) -> Vec<Token>{
             },        
             dfa::State::Unaccepted => {
                 // 获取该单词在源文件中实际的结束位置
-                end_row = f.position().0; 
-                end_col = f.position().1;
-                println!("遇到一个词法错误，在第{}行,第{}列附近，请检查!", end_row, end_col);
+                println!("遇到一个词法错误，在第{}行,第{}列附近，请检查!", start_row, start_col);
                 panic!("Miss error, please check!");
             },
             dfa::State::MoveTo(s) => {
@@ -103,6 +96,12 @@ pub fn run(filepath: &str) -> Vec<Token>{
                 state = dfa.unwrap()(s, c);
                 // 当DFA的状态转移还没有结束的时候
                 // 就将字符指针向后移动一位
+                if (c as u8) == Source::newline() {
+                    f.add_row();
+                    f.init_col();
+                } else {
+                    f.add_col();
+                }
                 f.next_pointer();
             }
         }                                                             

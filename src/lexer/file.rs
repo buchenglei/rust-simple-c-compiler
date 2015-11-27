@@ -9,7 +9,6 @@ pub struct Source {
 	len: usize,
 	row: u32,
 	col: u32,
-	//filename: &str,
 }
 
 impl Source {
@@ -24,12 +23,12 @@ impl Source {
 		// 在后面的逻辑中，字符流的结尾至少需要加2个空格才能正常工作
 		buf.push(32);
 		buf.push(32);
-		// 构造Source，并返回
+        // 构造Source，并返回
 		Source {
 			pointer: 0,
 			len: buf.len(),
 			row: 1,
-			col: 0, // 初始位置在第1行，第0列
+			col: 1, // 初始位置在第1行，第0列
 			buffer: buf,
  		}
 	}
@@ -68,13 +67,6 @@ impl Source {
 			return None;
 		}
 		if c.is_ascii() {
-			// 标记字符的位置
-			if c == Source::newline() {
-				self.row += 1;
-				self.col = 0;
-			} else {
-				self.col += 1;
-			}
 			// 指针后移一位
 			//self.pointer += 1;
 			// 将所有空白符替换为空格
@@ -88,6 +80,14 @@ impl Source {
 	
 	pub fn back_pointer(&mut self) {
 		self.pointer -= 1;
+        // 注意！！！！
+        // 比如在识别行尾的词法单元的时候，识别结束时，
+        // 指针会指向下一行的开头，此时行标记已经+1了，
+        // 但是指针一旦回退，又会重新指向换行符，在get_char的时候又会重新使得行标+1
+        // 所以这里行标要先-1
+        if self.buffer[self.pointer] == Source::newline() {
+            self.row -= 1;
+        }
         if self.col != 0 {
             self.col -= 1;
         }
@@ -101,7 +101,7 @@ impl Source {
     pub fn next_pointer(&mut self) {
         self.pointer += 1
     }
-	
+
 	// 获得指定范围的字符并组成一个String返回
 	pub fn get_word(&self, start: usize, end: usize) -> String {
 		let tmp_vec = &self.buffer[start..end];
@@ -115,4 +115,9 @@ impl Source {
 	pub fn get_pointer(&self) -> usize {
 		self.pointer
 	}
+
+    pub fn add_row(&mut self) { self.row += 1; }
+    pub fn add_col(&mut self) { self.col += 1; }
+    pub fn init_col(&mut self) { self.col = 1; }
+
 }
