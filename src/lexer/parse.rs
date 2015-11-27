@@ -11,6 +11,11 @@ pub fn run(filepath: &str) {
     let mut change_dfa: bool = true;
 	// 当前状态
     let mut state: dfa::State = dfa::State::MoveTo(0);
+    // 标记单词在文本中实际的位置
+    let mut start_row: u32 = 0;
+    let mut start_col: u32 = 0;
+    let mut end_row: u32 = 0;
+    let mut end_col: u32 = 0;
 	// 词素开始的位置
     let mut start: usize = 0;
 	// 词素结束的位置
@@ -26,6 +31,9 @@ pub fn run(filepath: &str) {
             start = f.get_pointer();
             // 重置状态
             state = dfa::State::MoveTo(0);
+            // 重新选择标DFA的地方就是标记单词开始的地方
+            start_row = f.position().0; 
+            start_col = f.position().1;
         }
 		// check state
         match state {
@@ -37,6 +45,10 @@ pub fn run(filepath: &str) {
                 end = f.get_pointer();
 				// 这里获取单词时的范围，包含start，但不包含end，遵循rust的语法风格
                 word = f.get_word(start, end);
+                // 获取该单词在源文件中实际的结束位置
+                end_row = f.position().0; 
+                end_col = f.position().1;
+                println!("this word start at ({},{}), end at ({},{})", start_row,start_col,end_row,end_col);
                 // 对DFA返回的不同类型的结果做分别处理
                 match *t {
                     WordType::Id => {
@@ -56,8 +68,13 @@ pub fn run(filepath: &str) {
 				// 已完成一个单词的识别，需要重新选择dfa识别函数
                 change_dfa = true; 
             },        
-			// 总感觉按照现在的程序逻辑，是不可能执行到这个分支的!!!!!!!!!!!!
-            dfa::State::Unaccepted => println!("Error!!!"),
+            dfa::State::Unaccepted => {
+                // 获取该单词在源文件中实际的结束位置
+                end_row = f.position().0; 
+                end_col = f.position().1;
+                println!("遇到一个词法错误，在第{}行,第{}列附近，请检查!", end_row, end_col);
+                panic!("Miss error, please check!");
+            },
             dfa::State::MoveTo(s) => {
 				// 状态还在转移中，不需要重新选择识别函数
                 change_dfa = false;
