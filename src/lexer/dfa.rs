@@ -8,7 +8,7 @@ pub enum State {
 	Accepted(WordType) // 可接受状态
 }
 
-pub fn choose_dfa(c: char) -> Option<DFA> {
+pub fn choose_dfa(c: char, nc: char) -> Option<DFA> {
 	// c是一个字母
 	if c.is_alphabetic() {
 		return Some(dfa_id);
@@ -25,7 +25,7 @@ pub fn choose_dfa(c: char) -> Option<DFA> {
     if c == '"' {
         return Some(dfa_string)
     }
-    if c == '#' {
+    if c == '/' && (nc == '*' || nc == '/') {
         return Some(dfa_comments)
     }
     if c == '{' || c =='}' || c == '(' || c == ')' || c == ';' || c == ','{
@@ -232,7 +232,7 @@ fn dfa_string(s: u8, c: char) -> State {
 pub fn dfa_comments(s: u8, c: char) -> State {
     match s {
         0 => {
-            if c == '#' {
+            if c == '/' {
                 State::MoveTo(1)
             } else {
                 State::Unaccepted
@@ -241,7 +241,7 @@ pub fn dfa_comments(s: u8, c: char) -> State {
         1 => {
             if c == '*' {
                 State::MoveTo(2)
-            } else if c == '#' {
+            } else if c == '/' {
                 State::MoveTo(3)
             } else {
                 State::Unaccepted
@@ -262,7 +262,7 @@ pub fn dfa_comments(s: u8, c: char) -> State {
             }
         },
         4 => {
-            if c == '#' {
+            if c == '/' {
                 State::MoveTo(7)
             } else {
                 State::Unaccepted

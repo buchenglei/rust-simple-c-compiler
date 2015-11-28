@@ -26,7 +26,12 @@ pub fn run(filepath: &str) -> Vec<Token>{
     while let Some(c) = f.get_char() {
 		// 这里只有当状态为Accepted是才更新dfa选择函数
         if change_dfa {
-            dfa = dfa::choose_dfa(c);
+            // nc == next char
+            if let Some(nc) = f.look_forward() {
+                dfa = dfa::choose_dfa(c, nc);
+            } else {
+                dfa = dfa::choose_dfa(c, ' ');
+            }
 			// 重置位置
             start = f.get_pointer();
             // 重置状态

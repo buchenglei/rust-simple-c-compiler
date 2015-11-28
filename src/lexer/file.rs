@@ -77,6 +77,16 @@ impl Source {
 			None
 		}
 	}
+
+    // 向前查看一个字符
+    pub fn look_forward(&mut self) -> Option<char> {
+        self.pointer += 1;
+        // 统一使用get_char这种方式获取字符
+        let c: Option<char> = self.get_char();
+        // 获取完后，在将指针回退一位
+        self.pointer -= 1;
+        c
+    }
 	
 	pub fn back_pointer(&mut self) {
 		self.pointer -= 1;
