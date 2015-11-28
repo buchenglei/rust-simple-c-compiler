@@ -41,6 +41,7 @@ pub enum Word {
 	LE, // <=
 	EQ, // =
 	EE, // ==
+    NEG, // ! 取反运算
 	NE, // !=
 	GT, // >
 	GE, // >=
@@ -203,6 +204,7 @@ impl Token {
                     "<=" => Word::LE,
                     "=" => Word::EQ,
                     "==" => Word::EE,
+                    "!" => Word::NEG,
                     "!=" => Word::NE,
                     ">" => Word::GT,
                     ">=" => Word::GE,
