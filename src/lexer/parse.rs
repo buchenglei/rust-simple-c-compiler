@@ -1,6 +1,6 @@
 use lexer::file::{Source};
 use lexer::dfa;
-use lexer::token::{WordType, Token};
+use lexer::token::{Word, Token};
 
 // 执行词法分析器parse
 pub fn run(filepath: &str) -> Vec<Token>{
@@ -52,34 +52,38 @@ pub fn run(filepath: &str) -> Vec<Token>{
                 word = f.get_word(start, end);
                 // 对DFA返回的不同类型的结果做分别处理
                 match *t {
-                    WordType::Id => {
+                    dfa::WordType::Id => {
+                        if Token::is_keyword(&word) {
+                            tokens.push(Token::new(
+                                Word::Keyword(Word::get_index("kw", word)),
+                                start_row,
+                                start_col
+                            ));
+                        } else {
+                            tokens.push(Token::new(
+                                Word::Id(word),
+                                start_row,
+                                start_col
+                            ));
+                        }
+                    },
+                    dfa::WordType::Operator => {
                         tokens.push(Token::new(
-                            Token::str_to_word(word, WordType::Id),
-                            WordType::Id,
+                            Word::Operator(Word::get_index("op", word)),
                             start_row,
                             start_col
                         ));
                     },
-                    WordType::Operator => {
+                    dfa::WordType::Separator => {
                         tokens.push(Token::new(
-                            Token::str_to_word(word, WordType::Operator),
-                            WordType::Operator,
+                            Word::Separator(Word::get_index("sp", word)),
                             start_row,
                             start_col
                         ));
                     },
-                    WordType::Separator => {
+                    dfa::WordType::Value => {
                         tokens.push(Token::new(
-                            Token::str_to_word(word, WordType::Separator),
-                            WordType::Separator,
-                            start_row,
-                            start_col
-                        ));
-                    },
-                    WordType::Value => {
-                        tokens.push(Token::new(
-                            Token::str_to_word(word, WordType::Value),
-                            WordType::Value,
+                            Word::Value(word),
                             start_row,
                             start_col
                         ));

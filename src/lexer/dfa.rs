@@ -1,6 +1,14 @@
-use lexer::token::{Word, WordType, Token};
+use lexer::token::Token;
 use lexer::file::Source;
 pub type DFA = fn(u8, char) -> State;
+
+pub enum WordType {
+    Id,
+    Value,
+    Operator,
+    Separator,
+    Other
+}
 
 pub enum State {
 	MoveTo(u8), // 待转移状态
@@ -77,7 +85,7 @@ pub fn dfa_whitespace(s: u8, c: char) -> State {
 			if Source::is_invisible_char(c as u8) {
 				State::MoveTo(1)
 			} else {
-				State::Accepted(WordType::Unknown)
+				State::Accepted(WordType::Other)
 			}
 		}
 		_ =>  State::Unaccepted
@@ -283,7 +291,7 @@ pub fn dfa_comments(s: u8, c: char) -> State {
             }
         },
         7 => {
-            State::Accepted(WordType::Unknown)
+            State::Accepted(WordType::Other)
         }
         _ => State::Unaccepted
     }

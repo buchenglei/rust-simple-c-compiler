@@ -1,4 +1,5 @@
-use lexer::token::{Word, WordType, Token};
+/*
+use lexer::token::{Word, Token};
 pub type NFA = fn(u8, char) -> Status;
 
 #[derive(Debug)]
@@ -48,3 +49,4 @@ pub fn nfa_id(s: u8, c: char) -> Status {
 		_ => Status::Unaccepted
 	}
 }
+*/
