@@ -1,4 +1,3 @@
-
 # Rust Simple C Compiler
 
 ### 这是一个使用Rust开发的simple c的编译器。
@@ -54,7 +53,11 @@
 注意：开发使用的Rust编译器版本是1.3
 
 ## 测试
-目前只能使用固定路径，请将源代码文件放在这: "D:/foo.c"
+编译完成后，编译测试代码到二进制文件所在的目录执行
+
+	rust-simple-c-compiler.exe filename.c
+	
+目前已在windows和linux上测试过，mac上能不能编译运行，天知道
 
 测试代码：
 
