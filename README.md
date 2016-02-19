@@ -42,6 +42,9 @@
 	同C语言
 	支持行内注释和块注释
 	/* */  //
+	
+### DFA
+[点击这里查看DFA图](https://www.processon.com/view/link/56c719c4e4b0f0c4286640c8)
 
 ## 安装
 
