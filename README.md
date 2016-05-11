@@ -60,7 +60,7 @@
 
 	rust-simple-c-compiler.exe filename.c
 	
-目前已在windows和linux上测试过，mac上能不能编译运行，天知道
+目前已在windows和linux上测试过，并且也在mac上测试通过，可以编译运行
 
 测试代码：
 

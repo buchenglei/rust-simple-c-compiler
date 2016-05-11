@@ -56,7 +56,7 @@ impl Source {
 	#[cfg(target_os = "linux")]
 	pub fn newline() -> u8 { 10 }
 	
-	#[cfg(target_os = "mac")]
+	#[cfg(target_os = "macos")]
 	pub fn newline() -> u8 { 13 }
 	
 	pub fn get_char(&mut self) -> Option<char> {
